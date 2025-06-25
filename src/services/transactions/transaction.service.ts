@@ -2,7 +2,7 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import type { TransactionsWithStatsApiResponse } from '../../types/transactions/transactions.types';
 
-const transactionServiceUrl = import.meta.env.VITE_AUTH_SERVICE_DEV_API_URL;
+const transactionServiceUrl = import.meta.env.VITE_AUTH_SERVICE_PROD_API_URL;
 
 export const transactions = createApi({
   reducerPath: 'api',

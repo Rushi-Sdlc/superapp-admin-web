@@ -5,6 +5,7 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { useFilteredSearch } from '../../hooks/useFilteredSearch';
+import { showApiErrorToast } from '../../utility/utility';
 
 const GetAllTransactions = () => {
   const [activeTab, setActiveTab] = useState<'all' | 'merchant'>('all');
@@ -142,6 +143,7 @@ const GetAllTransactions = () => {
 
   useEffect(() => {
     if (error) {
+      showApiErrorToast(error);
       console.error('Error fetching transactions:', error);
     }
   }, [error]);

@@ -1,0 +1,19 @@
+// services/api.ts
+import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import type { TransactionsApiResponse } from '../../types/transactions/transactions.types';
+
+const transactionServiceUrl = import.meta.env.VITE_AUTH_SERVICE_API_URL;
+
+export const transactions = createApi({
+  reducerPath: 'api',
+  baseQuery: fetchBaseQuery({
+    baseUrl: transactionServiceUrl,
+  }),
+  endpoints: (builder) => ({
+    getAllTransactions: builder.query<TransactionsApiResponse, void>({
+      query: () => '/admin/get-all-transactions',
+    }),
+  }),
+});
+
+export const { useGetAllTransactionsQuery } = transactions;

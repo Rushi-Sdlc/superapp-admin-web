@@ -1,10 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useGetAllTransactionsQuery } from '../../services/transactions/transaction.service';
-import {
-  DataGrid,
-  type GridColDef,
-  type GridValueGetter,
-} from '@mui/x-data-grid';
+import { DataGrid, type GridColDef } from '@mui/x-data-grid';
 
 const GetAllTransactions = () => {
   const [activeTab, setActiveTab] = useState<'all' | 'merchant'>('all');
@@ -13,20 +9,29 @@ const GetAllTransactions = () => {
   // Extract transactions safely
   const transactions = data?.data?.data ?? [];
 
+  // Utility function to show NA for empty/null/undefined
+  const displayValue = (value: string | number | null | undefined): string => {
+    return value === null || value === undefined || value === ''
+      ? 'NA'
+      : String(value);
+  };
+
   // Define columns
   const columns: GridColDef[] = [
     {
       field: 'referenceId',
       headerName: 'Reference ID',
       width: 200,
-      renderCell: (params) => <div className="text-xs">{params.value}</div>,
+      renderCell: (params) => (
+        <div className="text-xs">{displayValue(params.value)}</div>
+      ),
     },
     {
       field: 'amount',
       headerName: 'Amount',
       width: 120,
       renderCell: (params) => (
-        <div className="font-medium">{params.value} GNF</div>
+        <div className="font-medium">{displayValue(params.value)} GNF</div>
       ),
     },
     {
@@ -41,8 +46,9 @@ const GetAllTransactions = () => {
           add_money: 'Add Money',
           wallet_transfer: 'Wallet Transfer',
         };
+        const value = params.value;
         return (
-          <div className="text-sm">{typeMap[params.value] || params.value}</div>
+          <div className="text-sm">{displayValue(typeMap[value] || value)}</div>
         );
       },
     },
@@ -50,33 +56,41 @@ const GetAllTransactions = () => {
       field: 'direction',
       headerName: 'Direction',
       width: 120,
-      renderCell: (params) => (
-        <div
-          className={`text-sm font-medium ${
-            params.value === 'credit' ? 'text-green-600' : 'text-red-600'
-          }`}
-        >
-          {params.value.charAt(0).toUpperCase() + params.value.slice(1)}
-        </div>
-      ),
+      renderCell: (params) => {
+        const value = params.value;
+        if (!value) return <div className="text-sm text-gray-400">NA</div>;
+        return (
+          <div
+            className={`text-sm font-medium ${value === 'credit' ? 'text-green-600' : 'text-red-600'}`}
+          >
+            {value.charAt(0).toUpperCase() + value.slice(1)}
+          </div>
+        );
+      },
     },
     {
       field: 'status',
       headerName: 'Status',
       width: 130,
       renderCell: (params) => {
+        const value = params.value;
         const statusStyles: Record<string, string> = {
           completed: 'bg-green-100 text-green-800',
           pending: 'bg-yellow-100 text-yellow-800',
           failed: 'bg-red-100 text-red-800',
         };
+        if (!value) {
+          return (
+            <span className="text-xs px-2 py-1 rounded-full bg-gray-100 text-gray-800">
+              NA
+            </span>
+          );
+        }
         return (
           <span
-            className={`text-xs px-2 py-1 rounded-full ${
-              statusStyles[params.value] || 'bg-gray-100 text-gray-800'
-            }`}
+            className={`text-xs px-2 py-1 rounded-full ${statusStyles[value] || 'bg-gray-100 text-gray-800'}`}
           >
-            {params.value.charAt(0).toUpperCase() + params.value.slice(1)}
+            {value.charAt(0).toUpperCase() + value.slice(1)}
           </span>
         );
       },
@@ -84,18 +98,19 @@ const GetAllTransactions = () => {
     {
       field: 'createdAt',
       headerName: 'Date',
-      valueGetter: (params: GridValueGetter) =>
-        new Date(params.value as string).toLocaleString(),
-      renderCell: (params) => (
-        <div className="text-sm text-gray-600">{params.value}</div>
-      ),
+      width: 200,
+      renderCell: (params) => {
+        const date = params.row.createdAt;
+        const formatted = date ? new Date(date).toLocaleString() : 'NA';
+        return <div className="text-sm text-gray-600">{formatted}</div>;
+      },
     },
     {
       field: 'remarks',
       headerName: 'Remarks',
       width: 200,
       renderCell: (params) => (
-        <div className="text-sm">{params.value || '-'}</div>
+        <div className="text-sm">{displayValue(params.value)}</div>
       ),
     },
   ];
@@ -129,23 +144,57 @@ const GetAllTransactions = () => {
 
         {/* Summary Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-          <div className="bg-white rounded-md p-4 shadow-sm">
-            <p className="text-xs text-gray-500 mb-1">Total Transactions</p>
-            <p className="text-3xl font-semibold text-teal-700">
-              {transactions.length}
-            </p>
+          <div className="bg-white rounded-md p-4 shadow-sm flex flex-col justify-between h-32 relative">
+            <div>
+              <p className="text-1xl text-gray-500 mb-1">Total Transactions</p>
+              <p className="text-3xl font-semibold text-teal-700">
+                {transactions.length || 'NA'}
+              </p>
+            </div>
+            <div className="absolute bottom-3 left-4 text-sm text-gray-500">
+              <span className="text-xs text-gray-500 mb-1">
+                Total Transfer amount{' '}
+              </span>
+              <span className="font-bold text-black">
+                ${displayValue(data?.data?.totalAmountTransferred)}
+              </span>
+            </div>
           </div>
-          <div className="bg-white rounded-md p-4 shadow-sm">
-            <p className="text-xs text-gray-500 mb-1">Pending</p>
-            <p className="text-3xl font-semibold text-teal-700">
-              {transactions.filter((t) => t.status === 'pending').length}
-            </p>
+
+          <div className="bg-white rounded-md p-4 shadow-sm flex flex-col justify-between h-32 relative">
+            <div>
+              <p className="text-1xl text-gray-500 mb-1">
+                Successful Transactions
+              </p>
+              <p className="text-3xl font-semibold text-teal-700">
+                {displayValue(data?.data?.successfulTransactions)}
+              </p>
+            </div>
+            <div className="absolute bottom-3 left-4 text-sm text-gray-500">
+              <span className="text-xs text-gray-500 mb-1">
+                Total Successful amount{' '}
+              </span>
+              <span className="font-bold text-black">
+                ${displayValue(data?.data?.successfulAmount)}
+              </span>
+            </div>
           </div>
-          <div className="bg-white rounded-md p-4 shadow-sm">
-            <p className="text-xs text-gray-500 mb-1">Completed</p>
-            <p className="text-3xl font-semibold text-teal-700">
-              {transactions.filter((t) => t.status === 'completed').length}
-            </p>
+
+          <div className="bg-white rounded-md p-4 shadow-sm flex flex-col justify-between h-32 relative">
+            <div>
+              <p className="text-1xl text-gray-500 mb-1">Failed Transactions</p>
+              <p className="text-3xl font-semibold text-red-600">
+                {displayValue(data?.data?.failedTransactions)}
+              </p>
+            </div>
+            <div className="absolute bottom-3 left-4 text-sm text-gray-500">
+              <span className="text-xs text-gray-500 mb-1">
+                Total Failed amount{' '}
+              </span>
+              <span className="font-bold text-black">
+                ${displayValue(data?.data?.failedAmount)}
+              </span>
+            </div>
           </div>
         </div>
 

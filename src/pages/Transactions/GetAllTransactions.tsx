@@ -4,12 +4,11 @@ import { DataGrid, type GridColDef } from '@mui/x-data-grid';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
-import { useDebounce } from 'use-debounce';
+import { useFilteredSearch } from '../../hooks/useFilteredSearch';
 
 const GetAllTransactions = () => {
   const [activeTab, setActiveTab] = useState<'all' | 'merchant'>('all');
   const [searchTerm, setSearchTerm] = useState('');
-  const [debouncedSearchTerm] = useDebounce(searchTerm, 500);
   const [startDate, setStartDate] = useState<string>('');
   const [endDate, setEndDate] = useState<string>('');
 
@@ -23,22 +22,20 @@ const GetAllTransactions = () => {
       : String(value);
   };
 
-  const transactions = allTransactions.filter((txn) => {
-    const search = debouncedSearchTerm.toLowerCase();
-
-    const matchesSearch = Object.values(txn).some((value) =>
-      String(value).toLowerCase().includes(search),
-    );
-
-    const txnDate = new Date(txn.createdAt).getTime();
-
-    const start = startDate ? new Date(startDate).getTime() : null;
-    const end = endDate ? new Date(endDate).getTime() + 86400000 - 1 : null; // include full end day
-
-    const matchesDateRange =
-      (!start || txnDate >= start) && (!end || txnDate <= end);
-
-    return matchesSearch && matchesDateRange;
+  const transactions = useFilteredSearch({
+    data: allTransactions,
+    searchTerm,
+    startDate,
+    endDate,
+    searchableFields: [
+      'referenceId',
+      'type',
+      'direction',
+      'status',
+      'remarks',
+      'amount',
+    ],
+    dateField: 'createdAt',
   });
 
   const columns: GridColDef[] = [
@@ -147,7 +144,7 @@ const GetAllTransactions = () => {
     if (error) {
       console.error('Error fetching transactions:', error);
     }
-  }, [data, error]);
+  }, [error]);
 
   return (
     <div className="bg-gray-100 font-sans text-gray-700 p-4">

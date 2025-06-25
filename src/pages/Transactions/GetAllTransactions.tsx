@@ -1,6 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useGetAllTransactionsQuery } from '../../services/transactions/transaction.service';
 import { DataGrid, type GridColDef } from '@mui/x-data-grid';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { useDebounce } from 'use-debounce';
 
 const GetAllTransactions = () => {
@@ -240,21 +243,37 @@ const GetAllTransactions = () => {
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
-          <div className="flex items-center space-x-2">
-            <input
-              type="date"
-              className="rounded-md border px-3 py-2 text-sm w-32 focus:outline-none focus:ring-2 focus:ring-teal-500"
-              value={startDate}
-              onChange={(e) => setStartDate(e.target.value)}
-            />
-            <span className="text-gray-400">to</span>
-            <input
-              type="date"
-              className="rounded-md border px-3 py-2 text-sm w-32 focus:outline-none focus:ring-2 focus:ring-teal-500"
-              value={endDate}
-              onChange={(e) => setEndDate(e.target.value)}
-            />
-          </div>
+          <LocalizationProvider dateAdapter={AdapterDateFns}>
+            <div className="flex items-center space-x-2">
+              <DatePicker
+                label="Start Date"
+                value={startDate ? new Date(startDate) : null}
+                onChange={(date) =>
+                  setStartDate(date ? date.toISOString().split('T')[0] : '')
+                }
+                slotProps={{
+                  textField: {
+                    size: 'small',
+                    className: 'bg-white rounded-md',
+                  },
+                }}
+              />
+              <span className="text-gray-400">to</span>
+              <DatePicker
+                label="End Date"
+                value={endDate ? new Date(endDate) : null}
+                onChange={(date) =>
+                  setEndDate(date ? date.toISOString().split('T')[0] : '')
+                }
+                slotProps={{
+                  textField: {
+                    size: 'small',
+                    className: 'bg-white rounded-md',
+                  },
+                }}
+              />
+            </div>
+          </LocalizationProvider>
 
           <button className="bg-teal-600 hover:bg-teal-700 text-white rounded-md px-4 py-2 text-sm flex items-center space-x-1">
             <i className="fas fa-filter"></i>

@@ -1,5 +1,7 @@
-import React from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import logo from '../../src/assets/logo.png';
+import { useAuth } from '../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 interface HeaderProps {
   toggleSidebar: () => void;
@@ -7,6 +9,31 @@ interface HeaderProps {
 }
 
 const Header: React.FC<HeaderProps> = ({ toggleSidebar, title }) => {
+  const { logout } = useAuth();
+  const navigate = useNavigate();
+
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
   return (
     <header className="flex items-center justify-between px-4 py-3 border-b border-gray-200 bg-white fixed top-0 left-0 right-0 z-20 h-16">
       {/* Left Section */}
@@ -52,22 +79,40 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar, title }) => {
           <i className="far fa-bell"></i>
         </button>
 
-        <div className="flex items-center gap-2 cursor-pointer select-none group">
-          <div className="relative w-8 h-8">
-            <img
-              src="https://storage.googleapis.com/a1aa/image/9cb78551-fc58-45ef-d44f-556210541bcb.jpg"
-              alt="User avatar"
-              className="w-full h-full rounded-full object-cover border-2 border-transparent group-hover:border-gray-200 transition-all"
-            />
-            <span className="absolute bottom-0 right-0 w-2 h-2 bg-green-500 rounded-full border border-white"></span>
+        {/* Dropdown Avatar */}
+        <div className="relative" ref={dropdownRef}>
+          <div
+            className="flex items-center gap-2 cursor-pointer select-none group"
+            onClick={() => setDropdownOpen((prev) => !prev)}
+          >
+            <div className="relative w-8 h-8">
+              <img
+                src="https://storage.googleapis.com/a1aa/image/9cb78551-fc58-45ef-d44f-556210541bcb.jpg"
+                alt="User avatar"
+                className="w-full h-full rounded-full object-cover border-2 border-transparent group-hover:border-gray-200 transition-all"
+              />
+              <span className="absolute bottom-0 right-0 w-2 h-2 bg-green-500 rounded-full border border-white"></span>
+            </div>
+            <div className="hidden sm:block text-right leading-tight">
+              <p className="text-gray-900 font-semibold text-sm">Admin Login</p>
+              <p className="text-gray-400 text-xs truncate max-w-[120px]">
+                www.ipap.com
+              </p>
+            </div>
+            <i className="fas fa-chevron-down text-gray-400 text-xs hidden sm:block"></i>
           </div>
-          <div className="hidden sm:block text-right leading-tight">
-            <p className="text-gray-900 font-semibold text-sm">Admin Login</p>
-            <p className="text-gray-400 text-xs truncate max-w-[120px]">
-              www.ipap.com
-            </p>
-          </div>
-          <i className="fas fa-chevron-down text-gray-400 text-xs hidden sm:block"></i>
+
+          {/* Dropdown menu */}
+          {dropdownOpen && (
+            <div className="absolute right-0 mt-2 w-40 bg-white border border-gray-200 rounded shadow-lg z-50">
+              <button
+                onClick={handleLogout}
+                className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+              >
+                Logout
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </header>

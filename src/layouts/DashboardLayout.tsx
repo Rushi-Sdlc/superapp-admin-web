@@ -6,11 +6,11 @@ import Sidebar from '../components/Sidebar';
 // Map routes to page titles
 const routeTitles: Record<string, string> = {
   '/': 'Dashboard',
-  '/agent-management': 'Agent Management',
-  '/all-transactions': 'All Transactions',
   '/customer-management': 'Customer Management',
   '/merchant-management': 'Merchant Management',
+  '/agent-management': 'Agent Management',
   '/remittance-management': 'Remittance Management',
+  '/all-transactions': 'All Transactions',
   '/kyc-request': 'KYC Request',
   '/virtual-debit-request': 'Virtual Debit Request',
   '/manage-utility': 'Manage Utility',

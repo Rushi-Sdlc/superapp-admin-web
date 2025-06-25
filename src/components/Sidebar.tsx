@@ -6,20 +6,40 @@ import logo from '../assets/logo.png';
 const menuItems = [
   { name: 'Dashboard', icon: <LuLayoutDashboard />, path: '/' },
   {
+    name: 'Customer Management',
+    icon: <FaUserFriends />,
+    path: '/customer-management',
+  },
+  {
+    name: 'Merchant Management',
+    icon: <FaUserFriends />,
+    path: '/merchant-management',
+  },
+  {
     name: 'Agent Management',
     icon: <FaUserFriends />,
     path: '/agent-management',
   },
+  {
+    name: 'Remittance Management',
+    icon: <FaUserFriends />,
+    path: '/remittance-management',
+  },
   { name: 'All Transactions', icon: <FaUserFriends />, path: '/transactions' },
-  // { name: "Customer Management", icon: <FaUserFriends />, path: "/customer-management" },
-  // { name: "Merchant Management", icon: <FaUserFriends />, path: "/merchant-management" },
-  // { name: "Remittance Management", icon: <FaUserFriends />, path: "/remittance-management" },
-  // { name: "KYC Request", icon: <FaUserFriends />, path: "/kyc-request" },
-  // { name: "Virtual Debit Request", icon: <FaUserFriends />, path: "/virtual-debit-request" },
-  // { name: "Manage Utility", icon: <FaUserFriends />, path: "/manage-utility" },
-  // { name: "Advertisement", icon: <FaUserFriends />, path: "/advertisement" },
-  // { name: "Terms & Conditions", icon: <FaUserFriends />, path: "/terms-and-conditions" },
-  // { name: "Settings", icon: <FaUserFriends />, path: "/settings" },
+  { name: 'KYC Request', icon: <FaUserFriends />, path: '/kyc-request' },
+  {
+    name: 'Virtual Debit Request',
+    icon: <FaUserFriends />,
+    path: '/virtual-debit-request',
+  },
+  { name: 'Manage Utility', icon: <FaUserFriends />, path: '/manage-utility' },
+  { name: 'Advertisement', icon: <FaUserFriends />, path: '/advertisement' },
+  {
+    name: 'Terms & Conditions',
+    icon: <FaUserFriends />,
+    path: '/terms-and-conditions',
+  },
+  { name: 'Settings', icon: <FaUserFriends />, path: '/settings' },
 ];
 
 interface SidebarProps {

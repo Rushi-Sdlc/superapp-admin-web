@@ -1,22 +1,43 @@
 import { useState, useEffect } from 'react';
 import { useGetAllTransactionsQuery } from '../../services/transactions/transaction.service';
 import { DataGrid, type GridColDef } from '@mui/x-data-grid';
+import { useDebounce } from 'use-debounce';
 
 const GetAllTransactions = () => {
   const [activeTab, setActiveTab] = useState<'all' | 'merchant'>('all');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [debouncedSearchTerm] = useDebounce(searchTerm, 500);
+  const [startDate, setStartDate] = useState<string>('');
+  const [endDate, setEndDate] = useState<string>('');
+
   const { data, error, isLoading } = useGetAllTransactionsQuery();
 
-  // Extract transactions safely
-  const transactions = data?.data?.data ?? [];
+  const allTransactions = data?.data?.data ?? [];
 
-  // Utility function to show NA for empty/null/undefined
   const displayValue = (value: string | number | null | undefined): string => {
     return value === null || value === undefined || value === ''
       ? 'NA'
       : String(value);
   };
 
-  // Define columns
+  const transactions = allTransactions.filter((txn) => {
+    const search = debouncedSearchTerm.toLowerCase();
+
+    const matchesSearch = Object.values(txn).some((value) =>
+      String(value).toLowerCase().includes(search),
+    );
+
+    const txnDate = new Date(txn.createdAt).getTime();
+
+    const start = startDate ? new Date(startDate).getTime() : null;
+    const end = endDate ? new Date(endDate).getTime() + 86400000 - 1 : null; // include full end day
+
+    const matchesDateRange =
+      (!start || txnDate >= start) && (!end || txnDate <= end);
+
+    return matchesSearch && matchesDateRange;
+  });
+
   const columns: GridColDef[] = [
     {
       field: 'referenceId',
@@ -61,7 +82,9 @@ const GetAllTransactions = () => {
         if (!value) return <div className="text-sm text-gray-400">NA</div>;
         return (
           <div
-            className={`text-sm font-medium ${value === 'credit' ? 'text-green-600' : 'text-red-600'}`}
+            className={`text-sm font-medium ${
+              value === 'credit' ? 'text-green-600' : 'text-red-600'
+            }`}
           >
             {value.charAt(0).toUpperCase() + value.slice(1)}
           </div>
@@ -88,7 +111,9 @@ const GetAllTransactions = () => {
         }
         return (
           <span
-            className={`text-xs px-2 py-1 rounded-full ${statusStyles[value] || 'bg-gray-100 text-gray-800'}`}
+            className={`text-xs px-2 py-1 rounded-full ${
+              statusStyles[value] || 'bg-gray-100 text-gray-800'
+            }`}
           >
             {value.charAt(0).toUpperCase() + value.slice(1)}
           </span>
@@ -125,22 +150,6 @@ const GetAllTransactions = () => {
     <div className="bg-gray-100 font-sans text-gray-700 p-4">
       <div className="max-w-7xl mx-auto">
         <h1 className="text-2xl font-semibold mb-6">Transactions</h1>
-
-        {/* Tabs */}
-        <div className="flex space-x-6 border-b border-gray-300 mb-6 text-sm font-medium overflow-x-auto scrollbar-hide">
-          <button
-            className={`pb-3 whitespace-nowrap ${activeTab === 'all' ? 'text-teal-600 border-b-2 border-teal-600' : 'hover:text-teal-600'}`}
-            onClick={() => setActiveTab('all')}
-          >
-            All
-          </button>
-          <button
-            className={`pb-3 whitespace-nowrap ${activeTab === 'merchant' ? 'text-teal-600 border-b-2 border-teal-600' : 'hover:text-teal-600'}`}
-            onClick={() => setActiveTab('merchant')}
-          >
-            Merchant
-          </button>
-        </div>
 
         {/* Summary Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
@@ -198,33 +207,67 @@ const GetAllTransactions = () => {
           </div>
         </div>
 
-        {/* Filters UI (placeholders) */}
+        {/* Tabs */}
+        <div className="flex space-x-6 border-b border-gray-300 mb-6 text-sm font-medium overflow-x-auto scrollbar-hide">
+          <button
+            className={`pb-3 whitespace-nowrap ${
+              activeTab === 'all'
+                ? 'text-teal-600 border-b-2 border-teal-600'
+                : 'hover:text-teal-600'
+            }`}
+            onClick={() => setActiveTab('all')}
+          >
+            All
+          </button>
+          <button
+            className={`pb-3 whitespace-nowrap ${
+              activeTab === 'merchant'
+                ? 'text-teal-600 border-b-2 border-teal-600'
+                : 'hover:text-teal-600'
+            }`}
+            onClick={() => setActiveTab('merchant')}
+          >
+            Merchant
+          </button>
+        </div>
+
+        {/* Search and Filters */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-4 mb-4 space-y-3 sm:space-y-0">
           <input
             type="text"
             placeholder="Search..."
             className="flex-grow rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 min-w-0"
-            value=""
-            readOnly
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
           />
           <div className="flex items-center space-x-2">
             <input
               type="date"
               className="rounded-md border px-3 py-2 text-sm w-32 focus:outline-none focus:ring-2 focus:ring-teal-500"
-              readOnly
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
             />
             <span className="text-gray-400">to</span>
             <input
               type="date"
               className="rounded-md border px-3 py-2 text-sm w-32 focus:outline-none focus:ring-2 focus:ring-teal-500"
-              readOnly
+              value={endDate}
+              onChange={(e) => setEndDate(e.target.value)}
             />
           </div>
+
           <button className="bg-teal-600 hover:bg-teal-700 text-white rounded-md px-4 py-2 text-sm flex items-center space-x-1">
             <i className="fas fa-filter"></i>
             <span>Apply Filters</span>
           </button>
-          <button className="bg-red-600 hover:bg-red-700 text-white rounded-md px-4 py-2 text-sm flex items-center space-x-1">
+          <button
+            className="bg-red-600 hover:bg-red-700 text-white rounded-md px-4 py-2 text-sm flex items-center space-x-1"
+            onClick={() => {
+              setSearchTerm('');
+              setStartDate('');
+              setEndDate('');
+            }}
+          >
             <i className="fas fa-times"></i>
             <span>Clear All</span>
           </button>

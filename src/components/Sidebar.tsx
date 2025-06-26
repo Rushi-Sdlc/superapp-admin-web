@@ -1,5 +1,5 @@
 import { LuLayoutDashboard } from 'react-icons/lu';
-import { FaUserFriends } from 'react-icons/fa';
+import { FaUserFriends, FaDollarSign } from 'react-icons/fa';
 import { Link, useLocation } from 'react-router-dom';
 import logo from '../assets/logo.png';
 
@@ -8,7 +8,7 @@ const menuItems = [
   {
     name: 'Customer Management',
     icon: <FaUserFriends />,
-    path: '/customer-management',
+    path: '/customer',
   },
   {
     name: 'Merchant Management',
@@ -25,7 +25,7 @@ const menuItems = [
     icon: <FaUserFriends />,
     path: '/remittance-management',
   },
-  { name: 'All Transactions', icon: <FaUserFriends />, path: '/transactions' },
+  { name: 'All Transactions', icon: <FaDollarSign />, path: '/transactions' },
   { name: 'KYC Request', icon: <FaUserFriends />, path: '/kyc-request' },
   {
     name: 'Virtual Debit Request',

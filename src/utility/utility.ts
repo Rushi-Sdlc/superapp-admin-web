@@ -23,3 +23,18 @@ export const showSuccessToast = (message: string) => {
 export const showInfoToast = (message: string) => {
   toast.info(message);
 };
+
+export const formatDate = (
+  inputDate: string | Date | null | undefined,
+): string => {
+  if (!inputDate) return 'NA';
+
+  const date = new Date(inputDate);
+  if (isNaN(date.getTime())) return 'NA';
+
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, '0'); // Month is 0-indexed
+  const year = date.getFullYear();
+
+  return `${day}/${month}/${year}`;
+};

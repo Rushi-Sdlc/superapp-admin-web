@@ -5,7 +5,8 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { useFilteredSearch } from '../../hooks/useFilteredSearch';
-import { showApiErrorToast } from '../../utility/utility';
+import { formatDate, showApiErrorToast } from '../../utility/utility';
+import { downloadExcelFile } from '../../utility/downloadExcel';
 
 const GetAllTransactions = () => {
   const [activeTab, setActiveTab] = useState<'all' | 'merchant'>('all');
@@ -16,10 +17,15 @@ const GetAllTransactions = () => {
   const [page, setPage] = useState(0); // MUI is 0-based
   const [pageSize, setPageSize] = useState(25);
 
-  const { data, error, isLoading } = useGetAllTransactionsQuery({
-    page: page + 1, // Backend expects 1-based
-    limit: pageSize,
-  });
+  const { data, error, isLoading, refetch } = useGetAllTransactionsQuery(
+    {
+      page: page + 1, // Backend expects 1-based
+      limit: pageSize,
+    },
+    {
+      refetchOnMountOrArgChange: true, // ✅ triggers refetch if tab/page is re-mounted
+    },
+  );
 
   const allTransactions = data?.data?.data ?? [];
 
@@ -132,8 +138,7 @@ const GetAllTransactions = () => {
       headerName: 'Date',
       width: 200,
       renderCell: (params) => {
-        const date = params.row.createdAt;
-        const formatted = date ? new Date(date).toLocaleString() : 'NA';
+        const formatted = formatDate(params.row.createdAt);
         return <div className="text-sm text-gray-600">{formatted}</div>;
       },
     },
@@ -148,6 +153,7 @@ const GetAllTransactions = () => {
   ];
 
   useEffect(() => {
+    refetch();
     if (error) {
       showApiErrorToast(error);
       console.error('Error fetching transactions:', error);
@@ -165,7 +171,8 @@ const GetAllTransactions = () => {
             <div>
               <p className="text-1xl text-gray-500 mb-1">Total Transactions</p>
               <p className="text-3xl font-semibold text-teal-700">
-                {transactions.length || 'NA'}
+                {/* {transactions.length || 'NA'} */}
+                {displayValue(data?.data?.pagination?.totalRecords)}
               </p>
             </div>
             <div className="absolute bottom-3 left-4 text-sm text-gray-500">
@@ -280,9 +287,17 @@ const GetAllTransactions = () => {
             </div>
           </LocalizationProvider>
 
-          <button className="bg-teal-600 hover:bg-teal-700 text-white rounded-md px-4 py-2 text-sm flex items-center space-x-1">
-            <i className="fas fa-filter"></i>
-            <span>Apply Filters</span>
+          <button
+            className="bg-teal-600 hover:bg-teal-700 text-white rounded-md px-4 py-2 text-sm flex items-center space-x-1"
+            onClick={() =>
+              downloadExcelFile(
+                `${import.meta.env.VITE_AUTH_SERVICE_DEV_API_URL}/admin/proxy/transactions/export`,
+                'transactions.xlsx',
+              )
+            }
+          >
+            <i className="fas fa-download"></i>
+            <span>Download Excel</span>
           </button>
           <button
             className="bg-red-600 hover:bg-red-700 text-white rounded-md px-4 py-2 text-sm flex items-center space-x-1"

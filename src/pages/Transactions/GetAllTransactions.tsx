@@ -158,7 +158,7 @@ const GetAllTransactions = () => {
       showApiErrorToast(error);
       console.error('Error fetching transactions:', error);
     }
-  }, [error]);
+  }, [error, page, pageSize, searchTerm, startDate, endDate, refetch]);
 
   return (
     <div className="bg-gray-100 font-sans text-gray-700 p-4">

@@ -31,7 +31,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   const logout = () => {
     localStorage.removeItem('authToken');
     setToken(null);
-    // You might want to redirect to login here
   };
 
   return (

@@ -1,10 +1,10 @@
-// src/App.tsx
 import { BrowserRouter as Router, useLocation } from 'react-router-dom';
 import AppRoutes from './routes/routes';
 import DashboardLayout from './layouts/DashboardLayout';
 import { AuthProvider } from './context/AuthContext';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import PrivateRoute from './routes/PrivateRoute';
 
 function AppLayout() {
   const location = useLocation();
@@ -15,9 +15,11 @@ function AppLayout() {
       {isLoginRoute ? (
         <AppRoutes />
       ) : (
-        <DashboardLayout>
-          <AppRoutes />
-        </DashboardLayout>
+        <PrivateRoute>
+          <DashboardLayout>
+            <AppRoutes />
+          </DashboardLayout>
+        </PrivateRoute>
       )}
       <ToastContainer
         position="top-right"

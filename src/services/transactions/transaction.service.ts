@@ -1,23 +1,27 @@
+// services/transactions/transaction.service.ts
+
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-import type { TransactionsWithStatsApiResponse } from '../../types/transactions/transactions.types';
 
-const transactionServiceUrl = import.meta.env.VITE_AUTH_SERVICE_PROD_API_URL;
-
-export const transactions = createApi({
-  reducerPath: 'api',
+export const transactionApi = createApi({
+  reducerPath: 'transactionApi',
   baseQuery: fetchBaseQuery({
-    baseUrl: transactionServiceUrl,
+    baseUrl: import.meta.env.VITE_AUTH_SERVICE_DEV_API_URL,
     prepareHeaders: (headers) => {
       const token = localStorage.getItem('authToken');
-      if (token) headers.set('Authorization', `Bearer ${token}`);
+      if (token) {
+        headers.set('Authorization', `Bearer ${token}`);
+      }
       return headers;
     },
   }),
   endpoints: (builder) => ({
-    getAllTransactions: builder.query<TransactionsWithStatsApiResponse, void>({
-      query: () => '/admin/get-all-transactions',
+    getAllTransactions: builder.query({
+      query: ({ page = 1, limit = 25 }) => ({
+        url: `/admin/get-all-transactions?page=${page}&limit=${limit}`,
+        method: 'GET',
+      }),
     }),
   }),
 });
 
-export const { useGetAllTransactionsQuery } = transactions;
+export const { useGetAllTransactionsQuery } = transactionApi;

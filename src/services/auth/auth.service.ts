@@ -5,7 +5,7 @@ import type {
   AdminLoginResponse,
 } from '../../types/auth/auth.types';
 
-const authServiceUrl = import.meta.env.VITE_AUTH_SERVICE_PROD_API_URL;
+const authServiceUrl = import.meta.env.VITE_AUTH_SERVICE_DEV_API_URL;
 
 export const authApi = createApi({
   reducerPath: 'authApi',

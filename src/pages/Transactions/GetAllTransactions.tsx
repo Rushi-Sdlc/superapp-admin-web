@@ -13,7 +13,13 @@ const GetAllTransactions = () => {
   const [startDate, setStartDate] = useState<string>('');
   const [endDate, setEndDate] = useState<string>('');
 
-  const { data, error, isLoading } = useGetAllTransactionsQuery();
+  const [page, setPage] = useState(0); // MUI is 0-based
+  const [pageSize, setPageSize] = useState(25);
+
+  const { data, error, isLoading } = useGetAllTransactionsQuery({
+    page: page + 1, // Backend expects 1-based
+    limit: pageSize,
+  });
 
   const allTransactions = data?.data?.data ?? [];
 
@@ -299,15 +305,17 @@ const GetAllTransactions = () => {
               columns={columns}
               loading={isLoading}
               pagination
-              pageSizeOptions={[10, 25, 50, 100]}
-              initialState={{
-                pagination: {
-                  paginationModel: {
-                    pageSize: 25,
-                    page: 0,
-                  },
-                },
+              paginationMode="server"
+              paginationModel={{ page, pageSize }}
+              onPaginationModelChange={({
+                page: newPage,
+                pageSize: newPageSize,
+              }) => {
+                setPage(newPage);
+                setPageSize(newPageSize);
               }}
+              rowCount={data?.data?.pagination?.totalRecords || 0}
+              pageSizeOptions={[10, 25, 50, 100]}
               getRowId={(row) => row._id}
               sx={{
                 border: 'none',

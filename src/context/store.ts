@@ -1,14 +1,17 @@
 import { configureStore } from '@reduxjs/toolkit';
 import { authApi } from '../services/auth/auth.service';
-import { transactions } from '../services/transactions/transaction.service';
+import { transactionApi } from '../services/transactions/transaction.service';
 
 export const store = configureStore({
   reducer: {
     [authApi.reducerPath]: authApi.reducer,
-    [transactions.reducerPath]: transactions.reducer,
+    [transactionApi.reducerPath]: transactionApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware().concat(authApi.middleware, transactions.middleware),
+    getDefaultMiddleware().concat(
+      authApi.middleware,
+      transactionApi.middleware,
+    ),
 });
 
 export type RootState = ReturnType<typeof store.getState>;

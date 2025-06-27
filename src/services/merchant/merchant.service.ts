@@ -78,14 +78,15 @@ export const merchantApi = createApi({
     }),
     approveMerchant: builder.mutation({
       query: ({ id }) => ({
-        url: `/merchant/ekyc/${id}/approve`,
-        method: 'POST',
+        url: `/admin/approve-ekycReq-customer/${id}`,
+        method: 'PUT',
       }),
     }),
     rejectMerchant: builder.mutation({
-      query: ({ id }) => ({
-        url: `/merchant/ekyc/${id}/reject`,
-        method: 'POST',
+      query: ({ id, rejection_reason }) => ({
+        url: `/admin/reject-ekycReq-customer/${id}`,
+        method: 'PUT',
+        body: { rejection_reason },
       }),
     }),
   }),

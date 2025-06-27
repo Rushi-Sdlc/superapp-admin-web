@@ -43,7 +43,7 @@ const MerchantManagement = () => {
         `${user.first_name ?? ''} ${user.last_name ?? ''}`.trim() || user.email,
       userId: user._id,
       qrCode: user.wallet?.qr_code,
-      contact: user.wallet?.wallet_mobile_number || 'NA',
+      email: user.email || 'NA',
       createdAt: new Date(user.createdAt).toLocaleDateString(),
       status: user.is_active ? 'Active' : 'Inactive',
       ekyc: user.identity_verification_status,
@@ -73,7 +73,7 @@ const MerchantManagement = () => {
           <span className="text-xs text-gray-400">NA</span>
         ),
     },
-    { field: 'contact', headerName: 'Contact', width: 150 },
+    { field: 'email', headerName: 'Email', width: 150 },
     { field: 'createdAt', headerName: 'Joined Date', width: 150 },
     {
       field: 'status',

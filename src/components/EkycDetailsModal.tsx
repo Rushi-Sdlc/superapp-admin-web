@@ -23,7 +23,10 @@ const EkycDetailsModal: React.FC<MerchantEkycModalProps> = ({
   data,
 }) => {
   const user = data?.userDetails || {};
+
   const request = data || {};
+  console.log(request);
+
   const formatDateTime = (value?: string) => {
     if (!value) return 'N/A';
     return new Date(value).toLocaleString('en-IN', {
@@ -84,37 +87,61 @@ const EkycDetailsModal: React.FC<MerchantEkycModalProps> = ({
             Documents
           </h3>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-            {[
-              'national_id_document',
-              'driving_license_document',
-              'passport_document',
-            ].some((key) => request[key]?.length) ? (
-              [
-                'national_id_document',
-                'driving_license_document',
-                'passport_document',
-              ].flatMap(
-                (key) =>
-                  request[key]?.map((url: string, index: number) => (
+            {(() => {
+              const docItems: { label: string; urls: string[] }[] = [];
+
+              if (
+                Array.isArray(request.national_id_document) &&
+                request.national_id_document.length > 0
+              ) {
+                docItems.push({
+                  label: 'national id',
+                  urls: request.national_id_document,
+                });
+              }
+
+              if (
+                Array.isArray(request.driving_license_document) &&
+                request.driving_license_document.length > 0
+              ) {
+                docItems.push({
+                  label: 'driving license',
+                  urls: request.driving_license_document,
+                });
+              }
+
+              if (
+                typeof request.passport_id_document === 'string' &&
+                request.passport_id_document.length > 0
+              ) {
+                docItems.push({
+                  label: 'passport',
+                  urls: [request.passport_id_document],
+                });
+              }
+
+              return docItems.length > 0 ? (
+                docItems.flatMap((doc) =>
+                  doc.urls.map((url, index) => (
                     <div
-                      key={`${key}-${index}`}
+                      key={`${doc.label}-${index}`}
                       className="border rounded-md overflow-hidden shadow-sm"
                     >
                       <img
                         src={url}
-                        alt={`${key} ${index + 1}`}
+                        alt={`${doc.label} ${index + 1}`}
                         className="w-full h-40 object-cover"
                       />
                       <div className="text-xs text-center py-1 bg-gray-100 capitalize">
-                        {key.replace('_document', '').replace('_', ' ')}{' '}
-                        {index + 1}
+                        {doc.label} {index + 1}
                       </div>
                     </div>
-                  )) || [],
-              )
-            ) : (
-              <p className="text-sm text-gray-500">N/A</p>
-            )}
+                  )),
+                )
+              ) : (
+                <p className="text-sm text-gray-500">N/A</p>
+              );
+            })()}
           </div>
         </div>
       </DialogContent>

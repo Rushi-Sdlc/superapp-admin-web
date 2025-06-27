@@ -13,7 +13,7 @@ const menuItems = [
   {
     name: 'Merchant Management',
     icon: <FaUserFriends />,
-    path: '/merchant-management',
+    path: '/merchant',
   },
   {
     name: 'Agent Management',

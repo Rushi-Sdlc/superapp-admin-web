@@ -4,7 +4,6 @@ import { DataGrid, type GridColDef } from '@mui/x-data-grid';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
-import { useFilteredSearch } from '../../hooks/useFilteredSearch';
 import { formatDate, showApiErrorToast } from '../../utility/utility';
 import { downloadExcelFile } from '../../utility/downloadExcel';
 import Tooltip from '@mui/material/Tooltip';
@@ -15,7 +14,9 @@ const CustomerManagement = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [startDate, setStartDate] = useState<string>('');
   const [endDate, setEndDate] = useState<string>('');
-
+  const [activeTab, setActiveTab] = useState<
+    'all customers' | 'E-KYC Requests'
+  >('all customers');
   const [page, setPage] = useState(0); // MUI is 0-based
   const [pageSize, setPageSize] = useState(25);
 
@@ -29,7 +30,8 @@ const CustomerManagement = () => {
     },
   );
 
-  const allCustomers = data?.data ?? [];
+  // const allCustomers = data?.data ?? [];
+  const customers = data?.data ?? [];
 
   const displayValue = (value: string | number | null | undefined): string => {
     return value === null || value === undefined || value === ''
@@ -37,20 +39,20 @@ const CustomerManagement = () => {
       : String(value);
   };
 
-  const customers = useFilteredSearch({
-    data: allCustomers,
-    searchTerm,
-    startDate,
-    endDate,
-    searchableFields: [
-      'first_name',
-      'last_name',
-      'wallet.wallet_mobile_number',
-      '_id',
-      'identity_verification_status',
-    ],
-    dateField: 'createdAt',
-  });
+  // const customers = useFilteredSearch({
+  //   data: allCustomers,
+  //   searchTerm,
+  //   startDate,
+  //   endDate,
+  //   searchableFields: [
+  //     'first_name',
+  //     'last_name',
+  //     'wallet.wallet_mobile_number',
+  //     '_id',
+  //     'identity_verification_status',
+  //   ],
+  //   dateField: 'createdAt',
+  // });
 
   const columns: GridColDef[] = [
     {
@@ -178,49 +180,51 @@ const CustomerManagement = () => {
                 {displayValue(data?.pagination?.totalRecords)}
               </p>
             </div>
-            <div className="absolute bottom-3 left-4 text-sm text-gray-500">
-              <span className="text-xs text-gray-500 mb-1">
-                Active customers{' '}
-              </span>
-              <span className="font-bold text-black">
-                {displayValue(data?.activeCount)}
-              </span>
-            </div>
           </div>
 
           <div className="bg-white rounded-md p-4 shadow-sm flex flex-col justify-between h-32 relative">
             <div>
-              <p className="text-1xl text-gray-500 mb-1">Verified Customers</p>
+              <p className="text-1xl text-gray-500 mb-1">
+                New Customer{' '}
+                <span className="text-xs text-blue-600">(in 1 month)</span>
+              </p>
               <p className="text-3xl font-semibold text-teal-700">
-                {displayValue(data?.verifiedCount)}
+                {displayValue(data?.newCustomers)}
               </p>
-            </div>
-            <div className="absolute bottom-3 left-4 text-sm text-gray-500">
-              <span className="text-xs text-gray-500 mb-1">
-                Verified this month{' '}
-              </span>
-              <span className="font-bold text-black">
-                {displayValue(data?.monthlyVerifiedCount)}
-              </span>
             </div>
           </div>
 
           <div className="bg-white rounded-md p-4 shadow-sm flex flex-col justify-between h-32 relative">
             <div>
-              <p className="text-1xl text-gray-500 mb-1">Pending E-KYC</p>
-              <p className="text-3xl font-semibold text-red-600">
-                {displayValue(data?.pendingEkycCount)}
+              <p className="text-1xl text-gray-500 mb-1">Active Customers</p>
+              <p className="text-3xl font-semibold text-teal-700">
+                {displayValue(data?.activeCustomers)}
               </p>
             </div>
-            <div className="absolute bottom-3 left-4 text-sm text-gray-500">
-              <span className="text-xs text-gray-500 mb-1">
-                Rejected E-KYC{' '}
-              </span>
-              <span className="font-bold text-black">
-                {displayValue(data?.rejectedEkycCount)}
-              </span>
-            </div>
           </div>
+        </div>
+
+        <div className="flex space-x-6 border-b border-gray-300 mb-6 text-sm font-medium overflow-x-auto scrollbar-hide">
+          <button
+            className={`pb-3 whitespace-nowrap ${
+              activeTab === 'all customers'
+                ? 'text-teal-600 border-b-2 border-teal-600'
+                : 'hover:text-teal-600'
+            }`}
+            onClick={() => setActiveTab('all customers')}
+          >
+            All customers
+          </button>
+          <button
+            className={`pb-3 whitespace-nowrap ${
+              activeTab === 'E-KYC Requests'
+                ? 'text-teal-600 border-b-2 border-teal-600'
+                : 'hover:text-teal-600'
+            }`}
+            onClick={() => setActiveTab('E-KYC Requests')}
+          >
+            E-KYC Requests
+          </button>
         </div>
 
         {/* Search and Filters */}
@@ -296,6 +300,7 @@ const CustomerManagement = () => {
               rows={customers}
               columns={columns}
               loading={isLoading}
+              filterMode="client"
               pagination
               paginationMode="server"
               paginationModel={{ page, pageSize }}

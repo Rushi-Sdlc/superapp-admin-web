@@ -7,7 +7,7 @@ import Sidebar from '../components/Sidebar';
 const routeTitles: Record<string, string> = {
   '/': 'Dashboard',
   '/customer': 'Customer Management',
-  '/merchant-management': 'Merchant Management',
+  '/merchant': 'Merchant Management',
   '/agent-management': 'Agent Management',
   '/remittance-management': 'Remittance Management',
   '/all-transactions': 'All Transactions',

@@ -3,7 +3,7 @@
 export interface Wallet {
   _id: string;
   user_id: string;
-  merchant_id: string;
+  individual_id: string;
   wallet_id: string;
   qr_code: string;
   wallet_mobile_number: number;
@@ -27,7 +27,7 @@ export interface KycDocument {
   biometric_image: string;
 }
 
-export interface Merchant {
+export interface customer {
   _id: string;
   email: string;
   role: string;
@@ -35,7 +35,7 @@ export interface Merchant {
   isGuinea: boolean;
   phone_verified: boolean;
   email_verified: boolean;
-  merchant_id: string;
+  individual_id: string;
   is_passcode_set_by_dist_or_sub_dist: boolean;
   identity_verification_status: string;
   is_active: boolean;
@@ -55,14 +55,14 @@ export interface PaginationMeta {
   totalRecords: number;
 }
 
-export interface MerchantApiResponse {
+export interface CustomerApiResponse {
   success: boolean;
   message: string;
-  data: Merchant[];
+  data: customer[];
   pagination: PaginationMeta;
   totalCustomers: number;
-  totalNewMerchantsThisMonth: number;
-  totalActiveMerchants: number;
+  totalNewCustomersThisMonth: number;
+  totalActiveCustomers: number;
 }
 
 // types/merchant/merchant.types.ts (add at the bottom)
@@ -75,7 +75,7 @@ export interface EkycUserDetails {
   isGuinea: boolean;
   phone_verified: boolean;
   email_verified: boolean;
-  merchant_id: string;
+  individual_id: string;
   is_passcode_set_by_dist_or_sub_dist: boolean;
   identity_verification_status: string;
   is_active: boolean;

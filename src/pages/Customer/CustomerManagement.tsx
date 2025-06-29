@@ -3,18 +3,18 @@ import { DataGrid, type GridColDef } from '@mui/x-data-grid';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
-import { useGetAllMerchantsQuery } from '../../services/merchant/merchant.service';
+import { useGetAllCustomersQuery } from '../../services/customer/customer.service';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
 import { Edit, Delete, Visibility } from '@mui/icons-material';
-import MerchantEkyc from './MerchantEkyc'; // Import the MerchantEkyc component
+import CustomerEkyc from './CustomerEkyc'; // Import the CustomerEkyc component
 import { renderStatusBadge } from '../../utility/ui.utils';
 import { downloadExcelFile } from '../../utility/downloadExcel';
 import { displayValue } from '../../utility/utility';
 
-const MerchantManagement = () => {
-  const [activeTab, setActiveTab] = useState<'All merchant' | 'Ekyc Request'>(
-    'All merchant',
+const CustomerManagement = () => {
+  const [activeTab, setActiveTab] = useState<'All customer' | 'Ekyc Request'>(
+    'All customer',
   );
   const [searchTerm, setSearchTerm] = useState('');
   const [startDate, setStartDate] = useState<string>('');
@@ -34,7 +34,7 @@ const MerchantManagement = () => {
     [page, pageSize, startDate, endDate, activeTab],
   );
 
-  const { data, isLoading } = useGetAllMerchantsQuery(queryParams, {
+  const { data, isLoading } = useGetAllCustomersQuery(queryParams, {
     refetchOnMountOrArgChange: true,
   });
 
@@ -130,11 +130,11 @@ const MerchantManagement = () => {
   return (
     <div className="bg-gray-100 font-sans text-gray-700 p-4">
       <div className="max-w-7xl mx-auto">
-        <h1 className="text-2xl font-semibold mb-6">Merchant Management</h1>
+        <h1 className="text-2xl font-semibold mb-6">Customer Management</h1>
 
         {/* Tabs */}
         <div className="flex space-x-6 border-b border-gray-300 mb-6 text-sm font-medium">
-          {['All merchant', 'Ekyc Request'].map((tab) => (
+          {['All customer', 'Ekyc Request'].map((tab) => (
             <button
               key={tab}
               className={`pb-3 ${
@@ -150,7 +150,7 @@ const MerchantManagement = () => {
         </div>
 
         {activeTab === 'Ekyc Request' ? (
-          <MerchantEkyc />
+          <CustomerEkyc />
         ) : (
           <>
             {/* Summary Cards */}
@@ -172,7 +172,7 @@ const MerchantManagement = () => {
                     <span className="text-xs text-blue-500">(in 1 month)</span>
                   </p>
                   <p className="text-3xl font-semibold text-teal-700">
-                    {displayValue(data?.totalNewMerchantsThisMonth)}
+                    {displayValue(data?.totalNewCustomersThisMonth)}
                   </p>
                 </div>
               </div>
@@ -183,12 +183,11 @@ const MerchantManagement = () => {
                     Active Customers
                   </p>
                   <p className="text-3xl font-semibold text-teal-700">
-                    {displayValue(data?.totalActiveMerchants)}
+                    {displayValue(data?.totalActiveCustomers)}
                   </p>
                 </div>
               </div>
             </div>
-
             {/* Filters */}
             <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-4 mb-4 space-y-3 sm:space-y-0">
               <input
@@ -233,8 +232,8 @@ const MerchantManagement = () => {
                 className="bg-teal-600 hover:bg-teal-700 text-white rounded-md px-4 py-2 text-sm flex items-center space-x-1"
                 onClick={() =>
                   downloadExcelFile(
-                    `${import.meta.env.VITE_AUTH_SERVICE_DEV_API_URL}/admin/proxy/merchants/export`,
-                    'merchants.xlsx',
+                    `${import.meta.env.VITE_AUTH_SERVICE_DEV_API_URL}/admin/proxy/customers/export`,
+                    'customers.xlsx',
                   )
                 }
               >
@@ -298,4 +297,4 @@ const MerchantManagement = () => {
   );
 };
 
-export default MerchantManagement;
+export default CustomerManagement;

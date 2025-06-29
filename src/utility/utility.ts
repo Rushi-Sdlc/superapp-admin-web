@@ -38,3 +38,11 @@ export const formatDate = (
 
   return `${day}/${month}/${year}`;
 };
+
+export const displayValue = (
+  value: string | number | null | undefined,
+): string => {
+  return value === null || value === undefined || value === ''
+    ? 'NA'
+    : String(value);
+};

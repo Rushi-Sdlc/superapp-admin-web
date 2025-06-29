@@ -1,15 +1,13 @@
-// services/merchant/merchant.service.ts
-
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import type {
   EkycMerchantApiResponse,
-  MerchantApiResponse,
-} from '../../types/merchant/merchant.types';
+  CustomerApiResponse,
+} from '../../types/customer/customer.types';
 
 const baseUrl = import.meta.env.VITE_AUTH_SERVICE_DEV_API_URL;
 
-export const merchantApi = createApi({
-  reducerPath: 'merchantApi',
+export const customerApi = createApi({
+  reducerPath: 'customerApi',
   baseQuery: fetchBaseQuery({
     baseUrl,
     prepareHeaders: (headers) => {
@@ -21,8 +19,8 @@ export const merchantApi = createApi({
     },
   }),
   endpoints: (builder) => ({
-    getAllMerchants: builder.query<
-      MerchantApiResponse,
+    getAllCustomers: builder.query<
+      CustomerApiResponse,
       {
         page?: number;
         limit?: number;
@@ -52,12 +50,12 @@ export const merchantApi = createApi({
           );
 
         return {
-          url: `/admin/get-all-merchants?${params.toString()}`,
+          url: `/admin/get-user-data?${params.toString()}`,
           method: 'GET',
         };
       },
     }),
-    getEkycMerchants: builder.query<
+    getEkycCustomers: builder.query<
       EkycMerchantApiResponse,
       { page?: number; limit?: number; startDate?: string; endDate?: string }
     >({
@@ -71,7 +69,7 @@ export const merchantApi = createApi({
         if (endDate) params.append('endDate', endDate);
 
         return {
-          url: `/admin/get-ekycReq-merchant?${params.toString()}`,
+          url: `/admin/get-ekycReq-customer?${params.toString()}`,
           method: 'GET',
         };
       },
@@ -79,5 +77,5 @@ export const merchantApi = createApi({
   }),
 });
 
-export const { useGetAllMerchantsQuery, useGetEkycMerchantsQuery } =
-  merchantApi;
+export const { useGetAllCustomersQuery, useGetEkycCustomersQuery } =
+  customerApi;

@@ -1,7 +1,7 @@
 // MerchantEkyc.tsx
 import { useState, useMemo } from 'react';
 import { DataGrid, type GridColDef } from '@mui/x-data-grid';
-import { useGetEkycMerchantsQuery } from '../../services/merchant/merchant.service';
+import { useGetEkycCustomersQuery } from '../../services/customer/customer.service';
 import {
   useApproveMerchantMutation,
   useRejectMerchantMutation,
@@ -17,7 +17,7 @@ import MerchantEkycModal from '../../components/EkycDetailsModal';
 import { showApiErrorToast, showSuccessToast } from '../../utility/utility';
 import Dialog from '@mui/material/Dialog';
 
-const MerchantEkyc = () => {
+const CustomerEkyc = () => {
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState(10);
   const [searchTerm, setSearchTerm] = useState('');
@@ -47,7 +47,7 @@ const MerchantEkyc = () => {
     };
   }, [page, pageSize, startDate, endDate]);
 
-  const { data, isLoading, refetch } = useGetEkycMerchantsQuery(queryParams);
+  const { data, isLoading, refetch } = useGetEkycCustomersQuery(queryParams);
 
   const handleViewClick = (recordId: string) => {
     const record = data?.data?.find((item) => item._id === recordId);
@@ -113,7 +113,7 @@ const MerchantEkyc = () => {
           `${record.userDetails.first_name ?? ''} ${record.userDetails.last_name ?? ''}`.trim() ||
           'NA',
         email: record.userDetails.email || 'NA',
-        phone: record.userDetails.merchant_id || 'NA',
+        phone: record.userDetails.individual_id || 'NA',
         status: record.userDetails.identity_verification_status || 'NA',
       }));
   }, [data, searchTerm]);
@@ -322,4 +322,4 @@ const MerchantEkyc = () => {
   );
 };
 
-export default MerchantEkyc;
+export default CustomerEkyc;

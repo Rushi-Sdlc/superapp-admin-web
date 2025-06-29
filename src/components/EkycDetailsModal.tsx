@@ -25,7 +25,6 @@ const EkycDetailsModal: React.FC<MerchantEkycModalProps> = ({
   const user = data?.userDetails || {};
 
   const request = data || {};
-  console.log(request);
 
   const formatDateTime = (value?: string) => {
     if (!value) return 'N/A';
